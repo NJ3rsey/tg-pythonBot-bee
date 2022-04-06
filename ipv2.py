@@ -55,10 +55,18 @@ def ch(update, context):
         log.start()
         ping3.verbose_ping(context.args[0], count=6, size=1400)
         log.stop()
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text=log.messages)
 
-        print(*log.messages, sep="\n")
+        # context.bot.send_message(chat_id=update.effective_chat.id,
+        #                         text=log.messages)
+
+        def concat():
+            l = log.messages
+            print(l[::2])
+            # for every in range(len(l)):
+            return l
+
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text=concat())
 
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="\nВсе хорошо. Хост доступен и отвечает.")
