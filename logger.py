@@ -1,7 +1,7 @@
 import sys
 
 
-class Logger():
+class Logger:
     stdout = sys.stdout
     messages = []
 

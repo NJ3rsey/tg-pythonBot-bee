@@ -1,6 +1,7 @@
 import sys
 import ping3
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler)
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 import logging
 import settings
 
@@ -51,42 +52,44 @@ def check(update, context):
 
 # FOR TESTING NEEDS ========================================================
 def ch(update, context):
+    def concat():
+        l = log.messages
+        return "".join([str(x) for x in l])
+
     try:
         log.start()
         ping3.verbose_ping(context.args[0], count=6, size=1400)
         log.stop()
-
-        # context.bot.send_message(chat_id=update.effective_chat.id,
-        #                         text=log.messages)
-
-        def concat():
-            l = log.messages
-            print(l[::2])
-            # for every in range(len(l)):
-            return l
+        print(log.messages)
+        #context.bot.send_message(chat_id=update.effective_chat.id, text=concat())
 
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text=concat())
-
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="\nВсе хорошо. Хост доступен и отвечает.")
+                                 text=concat() + "\nВсе хорошо. Хост доступен и отвечает.")
     except ping3.errors.TimeToLiveExpired as err:
+
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text=err.ip_header[
-                                     "src_addr"])  # TimeToLiveExpired, DestinationUnreachable and DestinationHostUnreachable have ip_header and icmp_header attached.
+                # TimeToLiveExpired, DestinationUnreachable and DestinationHostUnreachable have ip_header and icmp_header attached.
+                                 text=concat() + err.ip_header["src_addr"])
     except ping3.errors.HostUnknown:
+        print(log.messages)
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Неизвестный или неверный хост.")
+                                 text=concat() + "Неизвестный или неверный хост.")
     except ping3.errors.Timeout:
+        print(log.messages)
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="Время запроса истекло, хост недоступен или не отвечает."
                                       "\n(Request timeout for ICMP packet)")
     except IndexError:
+        print(log.messages)
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Хост не указан")
+                                 text="Нет данных для проверки")
     except AttributeError:
+        print(log.messages)
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="Хост не указан")
+    except OSError:
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Ай-яй-яй, шалунишка")
 
 
 # ===========================================================================
@@ -112,11 +115,13 @@ def caps(update, context):
 # Обратите внимание, что из обработчика в функцию
 # передаются экземпляры `update` и `context`
 def start(update, context):
+    user = update.message.from_user
+    name = user.first_name
     # `bot.send_message` это метод Telegram API
     # `update.effective_chat.id` - определяем `id` чата,
     # откуда прилетело сообщение
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="")
+                             text="O, "+name+", привет :)\nКак дела?")
 
 
 def unknown(update, context):
@@ -129,6 +134,7 @@ class Logger:
     messages = []
 
     def start(self):
+        self.messages.clear()
         sys.stdout = self
 
     def stop(self):
@@ -160,7 +166,7 @@ caps_handler = CommandHandler('caps', caps)
 dispatcher.add_handler(caps_handler)
 
 # обработчик команды /ip
-check_handler = CommandHandler('c', check)
+check_handler = CommandHandler('check', check)
 # регистрируем обработчик в диспетчере
 dispatcher.add_handler(check_handler)
 
