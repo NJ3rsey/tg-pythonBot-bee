@@ -13,12 +13,3 @@ class Logger:
 
     def write(self, text):
         self.messages.append(text)
-
-
-log = Logger()
-
-log.start()
-print("sys", "123123")
-log.stop()
-
-print(log.messages)
