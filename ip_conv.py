@@ -54,6 +54,7 @@ def start(update, _):
 #     return PHOTO
 
 def first_state(update, _):
+    update.message.reply_text('и снова ')
     text = update.message.text
     _.bot.send_message(chat_id=update.effective_chat.id,
                        text=text)
@@ -70,6 +71,8 @@ def second_state(update, _):
     text = update.message.text
     update.message.reply_text(text)
     check(update, text)
+    update.message.reply_text('черкани еще что-нить умное')
+    return BIO3
 
 
 def bio3(update, _):
@@ -81,9 +84,8 @@ def bio3(update, _):
     # Пишем в журнал биографию или рассказ пользователя
     logger.info("Пользователь %s рассказал: %s", user.first_name, update.message.text)
     # Отвечаем на то что пользователь рассказал.
-    update.message.reply_text('Спасибо! Надеюсь, когда-нибудь снова сможем поговорить.')
+    update.message.reply_text('Спасибо! Надеюсь, тебе было не скучно.')
     # Заканчиваем разговор.
-
     return ConversationHandler.END
 
 
@@ -149,8 +151,7 @@ def check(update, ip):
 
     logger.info("Пользователь %s рассказал: %s", user.first_name, update.message.text)
     # Отвечаем на то что пользователь рассказал.
-    update.message.reply_text('Спасибо! Надеюсь')
-    return BIO3
+    update.message.reply_text('Спасибо! Проверено')
 
 
 # ===========================================================================
