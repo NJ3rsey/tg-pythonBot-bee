@@ -2,7 +2,7 @@ import pymysql
 
 TO = 15891589
 FROM = 5124580170
-bot = '-1158vgdpmOId6m7NPek'
+bot = '-1158vgdpmOId6m7NPe'
 end = 'AAHITOAGRNMnABC'
 
 api = (TO+FROM).__str__() + ":" + end + bot
